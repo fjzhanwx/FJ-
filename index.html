@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="skyblue" data-fontsize="medium">
+<html lang="zh-CN" data-theme="skyblue" data-fontsize="small">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>信息工作台</title>
 <style>
+
 /* ========== 重置与基础 ========== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
@@ -303,19 +304,17 @@ img{max-width:100%;display:block}
 
 /* 打印隐藏 */
 @media print{.sidebar,.topbar,.overlay,.modal-overlay{display:none}.main{margin:0}}
+
 </style>
 </head>
 <body>
 <div class="app">
-  <!-- 侧边栏 -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo-icon">
         <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm6 12H6v-1c0-2 4-3.1 6-3.1s6 1.1 6 3.1v1z"/></svg>
       </div>
-      <div class="logo-text">
-        <h1>信息工作台</h1>
-      </div>
+      <div class="logo-text"><h1>信息工作台</h1></div>
     </div>
     <div class="nav-menu">
       <a class="nav-item active" data-page="points">
@@ -352,1086 +351,128 @@ img{max-width:100%;display:block}
       </div>
     </div>
   </aside>
-  <div class="overlay" id="overlay"></div>
-
-  <!-- 主区域 -->
   <main class="main">
     <header class="topbar">
-      <button class="menu-toggle" id="menuToggle">
-        <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-      </button>
       <h2 class="topbar-title" id="pageTitle">信息报送要点</h2>
       <div class="topbar-spacer"></div>
       <span class="topbar-date" id="topbarDate"></span>
-      <button class="topbar-icon-btn" id="reinitBtn" title="重新初始化">
-        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" transform="rotate(45 12 12)"/></svg>
-      </button>
+      <span style="font-size:12px;color:var(--text-muted);background:var(--primary-bg);padding:2px 10px;border-radius:10px">发布版</span>
     </header>
     <div class="content" id="content"></div>
   </main>
 </div>
-
-<!-- 初始化向导弹窗 -->
-<div class="modal-overlay" id="initModal">
-  <div class="modal" style="max-width:600px">
-    <div class="modal-head">
-      <h2>欢迎使用信息工作台</h2>
-    </div>
-    <div class="wizard-progress">
-      <div style="display:flex;flex-direction:column;align-items:center;flex:1">
-        <div class="wizard-step-dot active" id="dot1">1</div>
-        <div class="wizard-step-label">信息报送要点</div>
-      </div>
-      <div class="wizard-step-line" id="line1"></div>
-      <div style="display:flex;flex-direction:column;align-items:center;flex:1">
-        <div class="wizard-step-dot" id="dot2">2</div>
-        <div class="wizard-step-label">上传得分表</div>
-      </div>
-    </div>
-    <div class="modal-body">
-      <!-- Step 1: 信息报送要点 -->
-      <div class="wizard-step active" id="step1">
-        <div class="form-group">
-          <label class="form-label">编辑信息报送要点 <span class="req">*</span></label>
-          <p style="font-size:calc(var(--fs-base) - 2px);color:var(--text-muted);margin-bottom:10px">每行一条要点，格式：分类 | 标题 | 内容（竖线分隔），也可只输入标题</p>
-          <textarea class="form-textarea" id="initPointsText" rows="8" placeholder="示例：&#10;重点关注 | 校园营销秋开学季 | 9月开学季校园营销是重中之重，需提前部署资源&#10;日常跟踪 | 基础业务高质量发展 | 持续跟踪基础业务发展态势，确保量质并重&#10;专项工作 | 党委攻克令落实"></textarea>
-        </div>
-        <div style="display:flex;justify-content:flex-end">
-          <button class="btn btn-primary" onclick="wizardNext(1)">下一步</button>
-        </div>
-      </div>
-      <!-- Step 2: 上传得分表 -->
-      <div class="wizard-step" id="step2">
-        <div class="form-group">
-          <label class="form-label">上传信息得分表</label>
-          <p style="font-size:calc(var(--fs-base) - 2px);color:var(--text-muted);margin-bottom:12px">上传Excel文件，将自动读取"全自动排序"工作表中的数据</p>
-          <div class="upload-zone" onclick="document.getElementById('initExcelInput').click()">
-            <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
-            <h3>点击选择文件</h3>
-            <p>支持 .xlsx / .xls 格式，可跳过此步稍后上传</p>
-          </div>
-          <input type="file" id="initExcelInput" accept=".xlsx,.xls" style="display:none">
-          <div id="initExcelName" style="margin-top:10px;font-size:calc(var(--fs-base) - 2px);color:var(--success);font-weight:600"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between">
-          <button class="btn btn-outline" onclick="wizardPrev(2)">上一步</button>
-          <button class="btn btn-primary" onclick="wizardFinish()">完成初始化</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- 通用编辑弹窗（信息报送要点新增/编辑） -->
-<div class="modal-overlay" id="editModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h2 id="editModalTitle">新增信息报送要点</h2>
-      <button class="modal-close" onclick="closeModal('editModal')">
-        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <label class="form-label">分类标签</label>
-        <input type="text" class="form-input" id="editCategory" placeholder="如：重点关注、日常跟踪、专项工作">
-      </div>
-      <div class="form-group">
-        <label class="form-label">标题 <span class="req">*</span></label>
-        <input type="text" class="form-input" id="editTitle" placeholder="输入要点标题">
-      </div>
-      <div class="form-group">
-        <label class="form-label">详细内容</label>
-        <textarea class="form-textarea" id="editContent" rows="5" placeholder="输入详细内容（可选）"></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">配图</label>
-        <div class="img-upload-area" onclick="document.getElementById('editImgInput').click()">
-          <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-          <p>点击上传图片（可选）</p>
-        </div>
-        <input type="file" id="editImgInput" accept="image/*" style="display:none">
-        <div id="editImgPreview"></div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModal('editModal')">取消</button>
-      <button class="btn btn-primary" onclick="savePoint()">保存</button>
-    </div>
-  </div>
-</div>
-
-<!-- 得分表上传弹窗 -->
-<div class="modal-overlay" id="scoreModal">
-  <div class="modal">
-    <div class="modal-head">
-      <h2>上传得分表</h2>
-      <button class="modal-close" onclick="closeModal('scoreModal')">
-        <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-      </button>
-    </div>
-    <div class="modal-body">
-      <div class="upload-zone" onclick="document.getElementById('scoreExcelInput').click()">
-        <svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>
-        <h3>点击选择Excel文件</h3>
-        <p>将自动读取"全自动排序"工作表</p>
-      </div>
-      <input type="file" id="scoreExcelInput" accept=".xlsx,.xls" style="display:none">
-      <div id="scoreUploadInfo" style="margin-top:12px"></div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost" onclick="closeModal('scoreModal')">关闭</button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast -->
-<div class="toast" id="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
-/* ========== 数据层 ========== */
-const DB = {
-  get(k, def){ try{ const v = localStorage.getItem('xxt_'+k); return v ? JSON.parse(v) : def; }catch(e){ return def; } },
-  set(k, v){ try{ localStorage.setItem('xxt_'+k, JSON.stringify(v)); return true; }catch(e){ showToast('存储空间不足，请删除部分图片或数据','error'); return false; } },
-  del(k){ localStorage.removeItem('xxt_'+k); }
-};
+var PUB_DATA = {"points":[{"id":1786667727159,"createdAt":"2026-08-14T00:35:27.159Z","category":"其他","title":"日常重点跟踪丨渠道建营、场景化营销、战略平台插旗、AI+行动、Token经营、“一降两升”等领域阶段性成效","content":""},{"id":1786667727162,"createdAt":"2026-08-14T00:35:27.161Z","category":"其他","title":"阶段重点工作丨详见月历","content":""},{"id":1786675983849,"category":"重点关注","title":"“息壤、Tokenhub、TeleAgent、智能化穿透式监管、低空、XC、视联网”等重点平台的市场卡位进展情况","content":"","image":null,"createdAt":"2026-08-14T02:53:03.849Z"}],"scoreData":{"sheetName":"Sheet1","tables":[{"title":"表格 1","rows":[["分公司","报送情况","省公司采用","省公司采用","省公司采用","省公司采用","集团公司采用","集团公司采用","省市政府采用","国务院国资委采用","省通管局采用","加 分 项 目","加 分 项 目","加 分 项 目","加 分 项 目","1-7月得分"],["","","《电信信息》","《情况通报》","《决策参考》","《简讯》","《电信信息》","《决策参考》","","","","好信息","领导批示","工作报告案例","调研报告",""],["厦门","44","29","0","0","0","2","0","1","1","1","2","1","2","0","147"],["南平","26","23","1","0","0","2","0","16","0","0","1","0","2","3","141"],["漳州","19","12","1","0","0","2","0","2","0","0","3","2","1","1","90"],["泉州","21","21","0","0","0","1","0","0","1","0","0","0","0","0","79"],["莆田","14","11","1","0","0","0","0","7","0","0","1","0","1","0","60"],["福州","18","13","0","0","0","0","0","0","0","0","0","0","0","0","39"],["三明","14","11","0","0","0","0","0","0","0","0","0","0","1","0","39"],["宁德","15","10","0","0","2","0","0","0","0","0","0","0","0","0","33"],["龙岩","12","10","0","0","2","0","0","0","0","0","0","0","0","0","33"]],"tab":"地市","merges":[{"sr":1,"sc":1,"er":2,"ec":1},{"sr":1,"sc":2,"er":2,"ec":2},{"sr":1,"sc":9,"er":2,"ec":9},{"sr":1,"sc":10,"er":2,"ec":10},{"sr":1,"sc":11,"er":2,"ec":11},{"sr":1,"sc":16,"er":2,"ec":16}]},{"title":"表格 1","rows":[["直报点","报送情况","省公司采用","省公司采用","省公司采用","省公司采用","集团公司采用","集团公司采用","市政府采用","国务院国资委采用","省通管局采用","加 分 项 目","加 分 项 目","加 分 项 目","加 分 项 目","1-7月得分"],["","","《电信信息》","《情况通报》","《决策参考》","《简讯》","《电信信息》","《决策参考》","","","","好信息","领导批示","工作报告案例","调研报告",""],["思明","6","3","0","0","0","1","0","0","0","0","0","0","0","0","15"],["海沧","4","2","0","0","0","0","0","0","0","0","0","0","0","0","6"],["仙游","2","2","0","0","0","0","0","0","0","0","0","0","0","0","6"],["晋江","3","2","0","0","0","0","0","0","0","0","0","0","0","0","6"],["惠安","2","2","0","0","0","0","0","0","0","0","0","0","0","0","6"],["福清","1","1","0","0","0","0","0","0","0","0","0","0","0","0","3"],["新罗","2","1","0","0","0","0","0","0","0","0","0","0","0","0","3"],["武夷山","1","1","0","0","0","0","0","0","0","0","0","0","0","0","3"],["鼓楼","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],["霞浦","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],["龙海","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],["永安","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"]],"tab":"直报点","merges":[{"sr":1,"sc":1,"er":2,"ec":1},{"sr":1,"sc":2,"er":2,"ec":2},{"sr":1,"sc":9,"er":2,"ec":9},{"sr":1,"sc":10,"er":2,"ec":10},{"sr":1,"sc":11,"er":2,"ec":11},{"sr":1,"sc":16,"er":2,"ec":16}]}],"rawRows":[["分公司","报送情况","省公司采用","省公司采用","省公司采用","省公司采用","集团公司采用","集团公司采用","省市政府采用","国务院国资委采用","省通管局采用","加 分 项 目","加 分 项 目","加 分 项 目","加 分 项 目","1-7月得分"],["","","《电信信息》","《情况通报》","《决策参考》","《简讯》","《电信信息》","《决策参考》","","","","好信息","领导批示","工作报告案例","调研报告",""],["厦门","44","29","0","0","0","2","0","1","1","1","2","1","2","0","147"],["南平","26","23","1","0","0","2","0","16","0","0","1","0","2","3","141"],["漳州","19","12","1","0","0","2","0","2","0","0","3","2","1","1","90"],["泉州","21","21","0","0","0","1","0","0","1","0","0","0","0","0","79"],["莆田","14","11","1","0","0","0","0","7","0","0","1","0","1","0","60"],["福州","18","13","0","0","0","0","0","0","0","0","0","0","0","0","39"],["三明","14","11","0","0","0","0","0","0","0","0","0","0","1","0","39"],["宁德","15","10","0","0","2","0","0","0","0","0","0","0","0","0","33"],["龙岩","12","10","0","0","2","0","0","0","0","0","0","0","0","0","33"],["","","","","","","","","","","","","","","",""],["","","","","","","","","","","","","","","",""],["直报点","报送情况","省公司采用","省公司采用","省公司采用","省公司采用","集团公司采用","集团公司采用","市政府采用","国务院国资委采用","省通管局采用","加 分 项 目","加 分 项 目","加 分 项 目","加 分 项 目","1-7月得分"],["","","《电信信息》","《情况通报》","《决策参考》","《简讯》","《电信信息》","《决策参考》","","","","好信息","领导批示","工作报告案例","调研报告",""],["思明","6","3","0","0","0","1","0","0","0","0","0","0","0","0","15"],["海沧","4","2","0","0","0","0","0","0","0","0","0","0","0","0","6"],["仙游","2","2","0","0","0","0","0","0","0","0","0","0","0","0","6"],["晋江","3","2","0","0","0","0","0","0","0","0","0","0","0","0","6"],["惠安","2","2","0","0","0","0","0","0","0","0","0","0","0","0","6"],["福清","1","1","0","0","0","0","0","0","0","0","0","0","0","0","3"],["新罗","2","1","0","0","0","0","0","0","0","0","0","0","0","0","3"],["武夷山","1","1","0","0","0","0","0","0","0","0","0","0","0","0","3"],["鼓楼","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],["霞浦","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],["龙海","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"],["永安","0","0","0","0","0","0","0","0","0","0","0","0","0","0","0"]],"parsedAt":"2026-08-14T02:20:35.858Z"},"scoreFileName":"1-7月.xlsx","knowledge":[{"name":"动态类信息","overview":"选题：领导调研、阶段性经营成效、项目签约、节日营销、重大通信保障\n篇幅：500字左右为宜，原则上不超过1千字","categories":[{"name":"领导调研信息","items":[{"title":"写作结构","body":"第一部分：领导调研概况（时间、地点、主要行程、陪同人员）\n第二部分：领导在调研点考察情况\n第三部分：主要领导在调研过程或座谈交流中的讲话精神"}]},{"name":"阶段性经营成效信息","items":[{"title":"写作结构","body":"导语部分：用最简练的话点明时间、地点、主要成效等关键信息，进行要点式总结、数据化提炼\n\n主体部分：分段、分层次阐述主要举措，突出亮点，避免事无巨细"}]},{"name":"项目中标信息","items":[{"title":"写作结构","body":"导语部分：概括项目中标情况、中标金额，提炼项目亮点（比如引入自研能力、全省首个）及预期效果\n\n主体部分：分段介绍项目主要内容及日常运营保障情况，避免过多阐述打单的艰辛以及客情关系"}]},{"name":"通信保障信息","items":[{"title":"写作结构","body":"第一部分：受灾情况，着重体现通信设施受损情况（包括线路、杆路、基站退服、乡镇全阻、影响用户数等）\n\n第二部分：抗灾情况，包括抢修力量投入（人次、车辆、油机等）、领导靠前指挥、网络运行监测和维护、机房局站排水、光缆线路巡察、防汛物资储备、应急通信保障、配合政府发送公益短信等"}]}]},{"name":"综合类信息","overview":"选题：典型经验总结，可全省复制推广；调研报告、行业竞争分析及对策、供管理层决策参考的意见建议\n篇幅：1千字左右，原则上不超过2千字","categories":[{"name":"经验类","items":[{"title":"写作结构（两种）","body":"结构一：取得成效（量化成绩）+ 具体措施（分条叙述）\n\n结构二：取得成效（主要篇幅）+ 仍存在问题 + 改进方向\n\n要点：成效尽量量化、多维度展开对比；措施要体现\"创新性\"，可学习借鉴，避免记流水帐"}]},{"name":"问题分析类","items":[{"title":"写作结构","body":"指出问题/介绍背景 + 分析原因 + 提出对策\n\n要点：问题分析要透彻（不等于多），提出对策要切实可行\n\n更高标准：站在企业发展的角度，提炼核心价值点"}]}]}],"calendarText":"8-9月：校园营销、基础业务高质量发展\n10月：中秋国庆双节营销\n12月：元旦春节双节营销\n8-12月：落实2026党委攻克令","fontsize":"small","theme":"skyblue"};
+var currentPage = "points";
+var currentScoreTab = 0;
+var currentKbL1 = 0;
+var currentKbL2 = 0;
+var SCORE_TABS = ["地市","直报点"];
 
-/* ========== 全局状态 ========== */
-let currentPage = 'points';
-let editingPointId = null;
-let editingImgData = null;
-let pendingExcelData = null;
+function _esc(s){ if(s==null) return ""; return String(s).replace(/&/g,"\x26amp;").replace(/</g,"\x26lt;").replace(/>/g,"\x26gt;").replace(/"/g,"\x26quot;"); }
+function _fd(iso){ if(!iso) return ""; var d=new Date(iso); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function _parseCS(text){ var lines=text.split("\n").filter(function(l){return l.trim();}); var spans=[]; for(var i=0;i<lines.length;i++){ var line=lines[i].trim(); var m=line.match(/(\d+)\s*[-\u2014\uff5e\~\u81f3]\s*(\d+)\s*\u6708[\uff1a:\uff1a]\s*(.+)/); if(m){ spans.push({monthLabel:m[1]+"-"+m[2]+"\u6708",content:m[3].trim()}); continue; } var m2=line.match(/(\d+)\s*\u6708[\uff1a:\uff1a]\s*(.+)/); if(m2){ spans.push({monthLabel:m2[1]+"\u6708",content:m2[2].trim()}); } } return spans; }
+function updateDate(){ var now=new Date(); var days=["日","一","二","三","四","五","六"]; document.getElementById("topbarDate").textContent=now.getFullYear()+"年"+(now.getMonth()+1)+"月"+now.getDate()+"日 周"+days[now.getDay()]; }
 
-/* ========== 图标库 ========== */
-const IC = {
-  edit:'<svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>',
-  del:'<svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>',
-  add:'<svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>',
-  upload:'<svg viewBox="0 0 24 24"><path d="M9 16h6v-6h4l-7-7-7 7h4zm-4 2h14v2H5z"/></svg>',
-  img:'<svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>',
-  empty:'<svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>',
-  cal:'<svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>',
-  chart:'<svg viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>',
-  refresh:'<svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>',
-  close:'<svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>'
-};
+function renderPage(){ var c=document.getElementById("content"); if(currentPage==="points") renderPoints(c); else if(currentPage==="scores") renderScores(c); else if(currentPage==="knowledge") renderKnowledge(c); }
 
-/* ========== 初始化 ========== */
-document.addEventListener('DOMContentLoaded', ()=>{
-  loadSettings();
-  updateDate();
-  setInterval(updateDate, 1000);
-  setupNav();
-  setupMenuToggle();
-  setupFontTheme();
-  setupModals();
-  setupReinit();
-  DB.set('initialized', true);
-  renderPage();
-});
-
-function updateDate(){
-  const now = new Date();
-  const days = ['日','一','二','三','四','五','六'];
-  const txt = now.getFullYear()+'年'+(now.getMonth()+1)+'月'+now.getDate()+'日 周'+days[now.getDay()];
-  const el = document.getElementById('topbarDate');
-  if(el) el.textContent = txt;
-}
-
-/* ========== 导航 ========== */
-function setupNav(){
-  document.querySelectorAll('.nav-item').forEach(item=>{
-    item.addEventListener('click', ()=>{
-      document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-      item.classList.add('active');
-      currentPage = item.dataset.page;
-      const titles = {points:'信息报送要点', scores:'信息得分情况', knowledge:'信息知识库'};
-      document.getElementById('pageTitle').textContent = titles[currentPage];
-      renderPage();
-      // 移动端关闭侧边栏
-      if(window.innerWidth <= 768){
-        document.getElementById('sidebar').classList.remove('open');
-        document.getElementById('overlay').classList.remove('show');
-      }
-    });
-  });
-}
-
-function setupMenuToggle(){
-  document.getElementById('menuToggle').addEventListener('click', ()=>{
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-  });
-  document.getElementById('overlay').addEventListener('click', ()=>{
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('show');
-  });
-}
-
-/* ========== 字体与主题 ========== */
-function setupFontTheme(){
-  document.querySelectorAll('.font-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
-      document.querySelectorAll('.font-btn').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const size = btn.dataset.size;
-      document.documentElement.setAttribute('data-fontsize', size);
-      DB.set('fontsize', size);
-    });
-  });
-  document.querySelectorAll('.theme-dot').forEach(dot=>{
-    dot.addEventListener('click', ()=>{
-      document.querySelectorAll('.theme-dot').forEach(d=>d.classList.remove('active'));
-      dot.classList.add('active');
-      const theme = dot.dataset.theme;
-      document.documentElement.setAttribute('data-theme', theme);
-      DB.set('theme', theme);
-    });
-  });
-}
-
-function loadSettings(){
-  const fs = DB.get('fontsize','medium');
-  const th = DB.get('theme','skyblue');
-  document.documentElement.setAttribute('data-fontsize', fs);
-  document.documentElement.setAttribute('data-theme', th);
-  document.querySelectorAll('.font-btn').forEach(b=>b.classList.toggle('active', b.dataset.size===fs));
-  document.querySelectorAll('.theme-dot').forEach(d=>d.classList.toggle('active', d.dataset.theme===th));
-}
-
-/* ========== 弹窗基础 ========== */
-function setupModals(){
-  document.querySelectorAll('.modal-overlay').forEach(overlay=>{
-    overlay.addEventListener('click', e=>{
-      if(e.target === overlay) overlay.classList.remove('show');
-    });
-  });
-  // 图片上传
-  document.getElementById('editImgInput').addEventListener('change', e=>{
-    const file = e.target.files[0];
-    if(file) compressImage(file, data=>{
-      editingImgData = data;
-      const pv = document.getElementById('editImgPreview');
-      pv.innerHTML = '<div class="img-preview"><img src="'+data+'"><button class="remove-img" onclick="removeEditImg()">'+IC.close+'</button></div>';
-    });
-  });
-  // 初始化Excel上传
-  document.getElementById('initExcelInput').addEventListener('change', e=>{
-    const file = e.target.files[0];
-    if(file){
-      parseExcel(file, (data, sheetName, tableCount)=>{
-        pendingExcelData = data;
-        document.getElementById('initExcelName').textContent = '已读取：'+sheetName+'（'+tableCount+'张表）';
-        showToast('Excel读取成功，共解析出'+tableCount+'张表','success');
-      }, err=>{
-        document.getElementById('initExcelName').textContent = '读取失败：'+err;
-        document.getElementById('initExcelName').style.color = 'var(--danger)';
-      });
-    }
-  });
-  // 得分表上传
-  document.getElementById('scoreExcelInput').addEventListener('change', e=>{
-    const file = e.target.files[0];
-    if(!file) return;
-    document.getElementById('scoreUploadInfo').innerHTML = '<p style="color:var(--text-muted)">正在读取...</p>';
-    parseExcel(file, (data, sheetName, tableCount)=>{
-      DB.set('scoreData', data);
-      DB.set('scoreFileName', file.name);
-      document.getElementById('scoreUploadInfo').innerHTML = '<p style="color:var(--success);font-weight:600">读取成功：'+sheetName+'</p><p style="color:var(--text-muted);font-size:calc(var(--fs-base)-2px);margin-top:4px">共解析出 '+tableCount+' 张表</p>';
-      showToast('得分表上传成功','success');
-      renderPage();
-    }, err=>{
-      document.getElementById('scoreUploadInfo').innerHTML = '<p style="color:var(--danger)">读取失败：'+err+'</p>';
-    });
-  });
-}
-
-function openModal(id){ document.getElementById(id).classList.add('show'); }
-function closeModal(id){ document.getElementById(id).classList.remove('show'); }
-
-function showToast(msg, type){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show '+(type||'');
-  setTimeout(()=>{ t.classList.remove('show'); }, 2500);
-}
-
-function setupReinit(){
-  document.getElementById('reinitBtn').addEventListener('click', ()=>{
-    if(confirm('确定要重新进入初始化设置吗？已保存的数据不会丢失，但可以重新配置。')){
-      showInitModal();
-    }
-  });
-}
-
-/* ========== 初始化向导 ========== */
-function showInitModal(){
-  document.getElementById('initModal').classList.add('show');
-  const points = DB.get('points', []);
-  if(points.length > 0){
-    document.getElementById('initPointsText').value = points.map(p=>{
-      if(p.category && p.content) return p.category+' | '+p.title+' | '+p.content;
-      if(p.category) return p.category+' | '+p.title;
-      return p.title;
-    }).join('\n');
-  }
-  wizardGoTo(1);
-}
-
-function wizardGoTo(step){
-  for(let i=1; i<=2; i++){
-    document.getElementById('step'+i).classList.toggle('active', i===step);
-    const dot = document.getElementById('dot'+i);
-    dot.classList.remove('active','done');
-    if(i < step){ dot.classList.add('done'); dot.textContent = '✓'; }
-    else if(i === step){ dot.classList.add('active'); dot.textContent = i; }
-    else{ dot.textContent = i; }
-    if(i < 2) document.getElementById('line'+i).classList.toggle('done', i < step);
-  }
-}
-
-function wizardNext(currentStep){
-  if(currentStep === 1){
-    const text = document.getElementById('initPointsText').value.trim();
-    if(!text){ showToast('请输入至少一条信息报送要点','error'); return; }
-    const points = parsePointsText(text);
-    DB.set('points', points);
-    wizardGoTo(2);
-  }
-}
-
-function wizardPrev(currentStep){
-  wizardGoTo(currentStep - 1);
-}
-
-function wizardFinish(){
-  // 保存Excel数据
-  if(pendingExcelData){
-    DB.set('scoreData', pendingExcelData);
-    pendingExcelData = null;
-  }
-  DB.set('initialized', true);
-  document.getElementById('initModal').classList.remove('show');
-  showToast('初始化完成！','success');
-  renderPage();
-}
-
-function parsePointsText(text){
-  const lines = text.split('\n').filter(l=>l.trim());
-  return lines.map((line, i)=>{
-    const parts = line.split('|').map(s=>s.trim());
-    const point = { id: Date.now()+i, createdAt: new Date().toISOString() };
-    if(parts.length >= 3){
-      point.category = parts[0];
-      point.title = parts[1];
-      point.content = parts[2];
-    } else if(parts.length === 2){
-      point.category = parts[0];
-      point.title = parts[1];
-      point.content = '';
-    } else {
-      point.category = '其他';
-      point.title = parts[0];
-      point.content = '';
-    }
-    return point;
-  });
-}
-
-/* ========== 页面渲染 ========== */
-function renderPage(){
-  const c = document.getElementById('content');
-  if(currentPage === 'points') renderPoints(c);
-  else if(currentPage === 'scores') renderScores(c);
-  else if(currentPage === 'knowledge') renderKnowledge(c);
-}
-
-/* ========== 信息报送要点模块 ========== */
 function renderPoints(c){
-  const points = DB.get('points', []);
-  let html = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">'+
-    '<button class="btn btn-primary" onclick="openEditModal()">'+IC.add+' 新增要点</button>'+
-    '<button class="btn btn-outline" onclick="openBatchEdit()">'+IC.edit+' 批量编辑</button>';
-  if(points.length > 0){
-    html += '<span style="font-size:calc(var(--fs-base)-2px);color:var(--text-muted);margin-left:auto">共 '+points.length+' 条要点</span>';
-  }
-  html += '</div>';
-  if(points.length === 0){
-    html += '<div class="card"><div class="empty-state">'+IC.empty+'<p>暂无信息报送要点</p><p class="hint">点击左上角"新增要点"开始添加</p></div></div>';
-  } else {
-    html += '<div class="points-grid">';
-    points.forEach(p=>{
-      html += '<div class="point-card" data-id="'+p.id+'">';
-      html += '<div class="point-tools">'+
-        '<button class="icon-btn-sm" onclick="openEditModal('+p.id+')" title="编辑">'+IC.edit+'</button>'+
-        '<button class="icon-btn-sm" onclick="deletePoint('+p.id+')" title="删除">'+IC.del+'</button>'+
-      '</div>';
-      if(p.category) html += '<span class="point-cat">'+esc(p.category)+'</span>';
-      html += '<h4>'+esc(p.title)+'</h4>';
-      if(p.content) html += '<p>'+esc(p.content)+'</p>';
-      if(p.image) html += '<div class="point-img"><img src="'+p.image+'"></div>';
-      html += '<div class="point-meta"><span>'+formatDate(p.createdAt)+'</span></div>';
-      html += '</div>';
-    });
-    html += '</div>';
-  }
-
-  // 信息报送要点月历
-  const calText = DB.get('calendarText', '');
-  if(calText.trim()){
-    const spans = parseCalendarSpans(calText);
-    if(spans.length > 0){
-      html += '<div class="cal-spans-bar" style="margin-top:28px"><h3>信息报送要点月历</h3>';
-      spans.forEach(s=>{
-        html += '<div class="cal-span-item"><span class="cal-span-month">'+esc(s.monthLabel)+'</span><span class="cal-span-text">'+esc(s.content)+'</span></div>';
-      });
-      html += '</div>';
+  var points=PUB_DATA.points||[]; var h="";
+  if(!points.length){ h+="<div class=\"card\"><div class=\"empty-state\"><p>暂无信息报送要点</p></div></div>"; }
+  else {
+    h+="<span style=\"font-size:calc(var(--fs-base)-2px);color:var(--text-muted);margin-bottom:16px;display:block\">共 "+points.length+" 条要点</span>";
+    h+="<div class=\"points-grid\">";
+    for(var i=0;i<points.length;i++){ var p=points[i];
+      h+="<div class=\"point-card\">";
+      if(p.category) h+="<span class=\"point-cat\">"+_esc(p.category)+"</span>";
+      h+="<h4>"+_esc(p.title)+"</h4>";
+      if(p.content) h+="<p>"+_esc(p.content)+"</p>";
+      if(p.image) h+="<div class=\"point-img\"><img src=\""+p.image+"\"></div>";
+      h+="<div class=\"point-meta\"><span>"+_fd(p.createdAt)+"</span></div></div>";
     }
+    h+="</div>";
   }
-
-  c.innerHTML = html;
+  var calText=PUB_DATA.calendarText||"";
+  if(calText.trim()){ var spans=_parseCS(calText); if(spans.length){
+    h+="<div class=\"cal-spans-bar\" style=\"margin-top:28px\"><h3>信息报送要点月历</h3>";
+    for(var j=0;j<spans.length;j++) h+="<div class=\"cal-span-item\"><span class=\"cal-span-month\">"+_esc(spans[j].monthLabel)+"</span><span class=\"cal-span-text\">"+_esc(spans[j].content)+"</span></div>";
+    h+="</div>";
+  }}
+  c.innerHTML=h;
 }
-
-function openEditModal(id){
-  editingPointId = id || null;
-  editingImgData = null;
-  if(id){
-    const points = DB.get('points', []);
-    const p = points.find(x=>x.id===id);
-    if(p){
-      document.getElementById('editModalTitle').textContent = '编辑信息报送要点';
-      document.getElementById('editCategory').value = p.category || '';
-      document.getElementById('editTitle').value = p.title || '';
-      document.getElementById('editContent').value = p.content || '';
-      editingImgData = p.image || null;
-      if(p.image){
-        document.getElementById('editImgPreview').innerHTML = '<div class="img-preview"><img src="'+p.image+'"><button class="remove-img" onclick="removeEditImg()">'+IC.close+'</button></div>';
-      } else {
-        document.getElementById('editImgPreview').innerHTML = '';
-      }
-    }
-  } else {
-    document.getElementById('editModalTitle').textContent = '新增信息报送要点';
-    document.getElementById('editCategory').value = '';
-    document.getElementById('editTitle').value = '';
-    document.getElementById('editContent').value = '';
-    document.getElementById('editImgPreview').innerHTML = '';
-  }
-  document.getElementById('editImgInput').value = '';
-  openModal('editModal');
-}
-
-function removeEditImg(){
-  editingImgData = null;
-  document.getElementById('editImgPreview').innerHTML = '';
-}
-
-function savePoint(){
-  const title = document.getElementById('editTitle').value.trim();
-  if(!title){ showToast('请输入标题','error'); return; }
-  const category = document.getElementById('editCategory').value.trim();
-  const content = document.getElementById('editContent').value.trim();
-  const points = DB.get('points', []);
-  if(editingPointId){
-    const idx = points.findIndex(p=>p.id===editingPointId);
-    if(idx >= 0){
-      points[idx].category = category;
-      points[idx].title = title;
-      points[idx].content = content;
-      points[idx].image = editingImgData;
-      points[idx].updatedAt = new Date().toISOString();
-    }
-  } else {
-    points.push({ id: Date.now(), category, title, content, image: editingImgData, createdAt: new Date().toISOString() });
-  }
-  DB.set('points', points);
-  closeModal('editModal');
-  showToast('保存成功','success');
-  renderPage();
-}
-
-function deletePoint(id){
-  if(!confirm('确定删除这条要点吗？')) return;
-  const points = DB.get('points', []).filter(p=>p.id!==id);
-  DB.set('points', points);
-  showToast('已删除','success');
-  renderPage();
-}
-
-function openBatchEdit(){
-  const points = DB.get('points', []);
-  const text = points.map(p=>{
-    if(p.category && p.content) return p.category+' | '+p.title+' | '+p.content;
-    if(p.category) return p.category+' | '+p.title;
-    return p.title;
-  }).join('\n');
-  const input = prompt('批量编辑信息报送要点（每行一条，格式：分类 | 标题 | 内容）', text);
-  if(input !== null){
-    const newPoints = parsePointsText(input);
-    DB.set('points', newPoints);
-    showToast('批量保存成功','success');
-    renderPage();
-  }
-}
-
-/* ========== parseCalendarSpans（供信息报送要点月历使用） ========== */
-function parseCalendarSpans(text){
-  const lines = text.split('\n').filter(l=>l.trim());
-  const spans = [];
-  for(const line of lines){
-    const m = line.trim().match(/(\d+)\s*[-—～~至]\s*(\d+)\s*月[：:]\s*(.+)/);
-    if(m){ spans.push({ monthLabel: m[1]+'-'+m[2]+'月', content: m[3].trim() }); continue; }
-    const m2 = line.trim().match(/(\d+)\s*月[：:]\s*(.+)/);
-    if(m2){ spans.push({ monthLabel: m2[1]+'月', content: m2[2].trim() }); }
-  }
-  return spans;
-}
-
-/* ========== 信息得分模块 ========== */
-let currentScoreTab = '地市';
 
 function renderScores(c){
-  const data = DB.get('scoreData', null);
-  let html = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">'+
-    '<button class="btn btn-primary" onclick="openScoreUpload()">'+IC.upload+' 上传得分表</button>';
-  if(data){
-    html += '<span style="font-size:calc(var(--fs-base)-2px);color:var(--text-muted);margin-left:auto">'+
-      DB.get('scoreFileName','已上传文件')+'</span>';
-  }
-  html += '</div>';
-
-  if(!data || !data.tables || data.tables.length === 0){
-    html += '<div class="card"><div class="empty-state">'+IC.empty+
-      '<p>暂无得分数据</p><p class="hint">请上传包含"全自动排序"工作表的Excel文件</p></div></div>';
-    c.innerHTML = html;
-    return;
-  }
-
-  // 标签
-  html += '<div class="score-tabs">'+
-    '<div class="score-tab'+(currentScoreTab==='地市'?' active':'')+'" onclick="switchScoreTab(\'地市\')">地市</div>'+
-    '<div class="score-tab'+(currentScoreTab==='直报点'?' active':'')+'" onclick="switchScoreTab(\'直报点\')">直报点</div>'+
-  '</div>';
-
-  // 显示当前标签下的表格
-  const tables = data.tables.filter(t=>t.tab === currentScoreTab);
-  if(tables.length === 0){
-    // 如果没有标签信息，显示所有表
-    const allTables = data.tables;
-    html += '<div class="card"><div class="empty-state">'+IC.empty+
-      '<p>当前标签下暂无表格数据</p><p class="hint">共 '+allTables.length+' 张表，可切换标签查看</p></div></div>';
-    // 显示所有表
-    allTables.forEach((t, i)=>{
-      html += renderScoreTable(t, i);
-    });
-  } else {
-    tables.forEach((t, i)=>{
-      html += renderScoreTable(t, i);
-    });
-  }
-
-  c.innerHTML = html;
+  var data=PUB_DATA.scoreData; var h="";
+  if(PUB_DATA.scoreFileName) h+="<span style=\"font-size:calc(var(--fs-base)-2px);color:var(--text-muted);margin-bottom:16px;display:block\">"+_esc(PUB_DATA.scoreFileName)+"</span>";
+  if(!data||!data.tables||!data.tables.length){ h+="<div class=\"card\"><div class=\"empty-state\"><p>暂无得分数据</p></div></div>"; c.innerHTML=h; return; }
+  h+="<div class=\"score-tabs\"><div class=\"score-tab"+(currentScoreTab===0?" active":"")+"\" onclick=\"switchScoreTab(0)\">地市</div><div class=\"score-tab"+(currentScoreTab===1?" active":"")+"\" onclick=\"switchScoreTab(1)\">直报点</div></div>";
+  var tabName=SCORE_TABS[currentScoreTab]||"地市";
+  var tables=data.tables.filter(function(t){return t.tab===tabName;});
+  if(!tables.length) tables=data.tables;
+  for(var i=0;i<tables.length;i++) h+=_rST(tables[i],i);
+  c.innerHTML=h;
 }
 
-function renderScoreTable(table, idx){
-  let html = '<div class="score-table-title">'+
-    '<span>'+(table.title || ('表格 '+(idx+1)))+'</span>';
-  if(table.tab) html += '<span class="tag">'+esc(table.tab)+'</span>';
-  html += '<span class="table-count-badge">'+table.rows.length+'行 × '+(table.rows[0]?table.rows[0].length:0)+'列</span>'+
-  '</div>';
-  html += '<div class="score-table-wrap"><table class="score-table"><thead><tr>';
-  const header = table.rows[0] || [];
-  header.forEach(cell=>{
-    html += '<th>'+esc(String(cell))+'</th>';
-  });
-  html += '</tr></thead><tbody>';
-  for(let i = 1; i < table.rows.length; i++){
-    html += '<tr>';
-    table.rows[i].forEach((cell, ci)=>{
-      let cls = '';
-      // 排名高亮
-      if(ci === 0 || (table.rows[0] && /排名|名次|序号/i.test(String(table.rows[0][ci])))){
-        const num = parseInt(cell);
-        if(num === 1) cls = ' class="rank-1"';
-        else if(num === 2) cls = ' class="rank-2"';
-        else if(num === 3) cls = ' class="rank-3"';
-      }
-      html += '<td'+cls+'>'+esc(String(cell))+'</td>';
-    });
-    html += '</tr>';
+function _rST(table,idx){
+  var h="<div class=\"score-table-title\"><span>"+(table.title||("表格 "+(idx+1)))+"</span>";
+  if(table.tab) h+="<span class=\"tag\">"+_esc(table.tab)+"</span>";
+  h+="<span class=\"table-count-badge\">"+table.rows.length+"行 \xd7 "+(table.rows[0]?table.rows[0].length:0)+"列</span></div>";
+  h+="<div class=\"score-table-wrap\"><table class=\"score-table\"><thead><tr>";
+  var header=table.rows[0]||[];
+  for(var i=0;i<header.length;i++) h+="<th>"+_esc(String(header[i]))+"</th>";
+  h+="</tr></thead><tbody>";
+  for(var r=1;r<table.rows.length;r++){ h+="<tr>";
+    for(var ci=0;ci<table.rows[r].length;ci++){ var cls="";
+      if(ci===0||(header[ci]&&/排名|名次|序号/i.test(String(header[ci])))){ var num=parseInt(table.rows[r][ci]); if(num===1) cls=" rank-1"; else if(num===2) cls=" rank-2"; else if(num===3) cls=" rank-3"; }
+      h+="<td class=\""+cls.trim()+"\">"+_esc(String(table.rows[r][ci]))+"</td>";
+    }
+    h+="</tr>";
   }
-  html += '</tbody></table></div>';
-  return html;
+  h+="</tbody></table></div>"; return h;
 }
 
-function switchScoreTab(tab){
-  currentScoreTab = tab;
-  renderPage();
-}
-
-function openScoreUpload(){
-  document.getElementById('scoreUploadInfo').innerHTML = '';
-  document.getElementById('scoreExcelInput').value = '';
-  openModal('scoreModal');
-}
-
-/* ========== 信息知识库模块 ========== */
-let currentKbL1 = 0; // 当前一级标签索引（0=动态类，1=综合类）
-let currentKbL2 = 0; // 当前二级分类索引
-
-// 默认知识库数据（首次进入时初始化）
-const DEFAULT_KB = [
-  {
-    name: '动态类信息',
-    overview: '选题：领导调研、阶段性经营成效、项目签约、节日营销、重大通信保障\n篇幅：500字左右为宜，原则上不超过1千字',
-    categories: [
-      { name: '领导调研信息', items: [
-        { title: '写作结构', body: '第一部分：领导调研概况（时间、地点、主要行程、陪同人员）\n第二部分：领导在调研点考察情况\n第三部分：主要领导在调研过程或座谈交流中的讲话精神' }
-      ]},
-      { name: '阶段性经营成效信息', items: [
-        { title: '写作结构', body: '导语部分：用最简练的话点明时间、地点、主要成效等关键信息，进行要点式总结、数据化提炼\n\n主体部分：分段、分层次阐述主要举措，突出亮点，避免事无巨细' }
-      ]},
-      { name: '项目中标信息', items: [
-        { title: '写作结构', body: '导语部分：概括项目中标情况、中标金额，提炼项目亮点（比如引入自研能力、全省首个）及预期效果\n\n主体部分：分段介绍项目主要内容及日常运营保障情况，避免过多阐述打单的艰辛以及客情关系' }
-      ]},
-      { name: '通信保障信息', items: [
-        { title: '写作结构', body: '第一部分：受灾情况，着重体现通信设施受损情况（包括线路、杆路、基站退服、乡镇全阻、影响用户数等）\n\n第二部分：抗灾情况，包括抢修力量投入（人次、车辆、油机等）、领导靠前指挥、网络运行监测和维护、机房局站排水、光缆线路巡察、防汛物资储备、应急通信保障、配合政府发送公益短信等' }
-      ]}
-    ]
-  },
-  {
-    name: '综合类信息',
-    overview: '选题：典型经验总结，可全省复制推广；调研报告、行业竞争分析及对策、供管理层决策参考的意见建议\n篇幅：1千字左右，原则上不超过2千字',
-    categories: [
-      { name: '经验类', items: [
-        { title: '写作结构（两种）', body: '结构一：取得成效（量化成绩）+ 具体措施（分条叙述）\n\n结构二：取得成效（主要篇幅）+ 仍存在问题 + 改进方向\n\n要点：成效尽量量化、多维度展开对比；措施要体现"创新性"，可学习借鉴，避免记流水帐' }
-      ]},
-      { name: '问题分析类', items: [
-        { title: '写作结构', body: '指出问题/介绍背景 + 分析原因 + 提出对策\n\n要点：问题分析要透彻（不等于多），提出对策要切实可行\n\n更高标准：站在企业发展的角度，提炼核心价值点' }
-      ]}
-    ]
-  }
-];
-
-function getKbData(){
-  let kb = DB.get('knowledge', null);
-  // 校验数据格式：必须是数组且每个元素有 categories 字段
-  if(!kb || !Array.isArray(kb) || !kb[0] || !kb[0].categories){
-    kb = JSON.parse(JSON.stringify(DEFAULT_KB));
-    DB.set('knowledge', kb);
-  }
-  return kb;
-}
+function switchScoreTab(idx){ currentScoreTab=idx; renderPage(); }
 
 function renderKnowledge(c){
-  const kb = getKbData();
-  if(currentKbL1 >= kb.length) currentKbL1 = 0;
-  const l1 = kb[currentKbL1];
-  if(!l1) return;
-  if(currentKbL2 >= l1.categories.length) currentKbL2 = 0;
-
-  // 工具栏
-  let html = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">'+
-    '<button class="btn btn-primary" onclick="uploadKbDoc()">'+IC.upload+' 上传文档</button>'+
-    '<span style="font-size:calc(var(--fs-base)-2px);color:var(--text-muted);margin-left:auto">'+kb.length+' 大类 · '+l1.categories.length+' 个分类</span>'+
-  '</div>';
-
-  // 一级标签
-  html += '<div class="kb-l1-tabs">';
-  kb.forEach((grp, i)=>{
-    html += '<div class="kb-l1-tab'+(i===currentKbL1?' active':'')+'" onclick="switchKbL1('+i+')">'+esc(grp.name)+'</div>';
-  });
-  html += '</div>';
-
-  // 概览
-  if(l1.overview){
-    html += '<div class="kb-overview">'+esc(l1.overview).replace(/\n/g,'<br>')+'</div>';
-  }
-
-  // 二级标签（横向胶囊）
-  html += '<div class="kb-l2-tabs">';
-  l1.categories.forEach((cat, i)=>{
-    html += '<div class="kb-l2-tab'+(i===currentKbL2?' active':'')+'" onclick="switchKbL2('+i+')">'+
-      '<span class="kb-l2-tab-name" contenteditable="true" onblur="renameKbL2('+i+',this.textContent)" onclick="event.stopPropagation()">'+esc(cat.name)+'</span>'+
-    '</div>';
-  });
-  html += '<button class="kb-add-l2" onclick="addKbL2()">+ 新增分类</button>';
-  html += '</div>';
-
-  // 当前二级分类内容
-  const cat = l1.categories[currentKbL2];
-  if(!cat){
-    html += '<div class="card"><div class="empty-state">'+IC.empty+'<p>暂无分类</p></div></div>';
-  } else {
-    // 添加条目
-    html += '<div class="kb-add-form">'+
-      '<input type="text" id="kbNewTitle" placeholder="输入标题（如：信息类型名称）">'+
-      '<input type="text" id="kbNewBody" placeholder="输入写作要求或具体内容">'+
-      '<button class="btn btn-primary" onclick="addKbItem()">添加</button>'+
-    '</div>';
-
-    if(!cat.items || cat.items.length === 0){
-      html += '<div class="card"><div class="empty-state"><p>当前分类暂无内容</p><p class="hint">在上方输入标题和内容添加条目，或上传文档自动导入</p></div></div>';
-    } else {
-      cat.items.forEach((item, idx)=>{
-        html += '<div class="kb-item">'+
-          '<div class="kb-item-tools">'+
-            '<button class="icon-btn-sm" onclick="deleteKbItem('+idx+')" title="删除">'+IC.del+'</button>'+
-          '</div>'+
-          '<div class="kb-item-title">'+esc(item.title)+'</div>'+
-          (item.body ? '<div class="kb-item-body">'+esc(item.body)+'</div>' : '')+
-        '</div>';
-      });
-    }
-  }
-
-  c.innerHTML = html;
+  var kb=PUB_DATA.knowledge;
+  if(!kb||!kb.length){ c.innerHTML="<div class=\"card\"><div class=\"empty-state\"><p>暂无知识库数据</p></div></div>"; return; }
+  if(currentKbL1>=kb.length) currentKbL1=0;
+  var l1=kb[currentKbL1]; if(!l1) return;
+  if(currentKbL2>=l1.categories.length) currentKbL2=0;
+  var h="<span style=\"font-size:calc(var(--fs-base)-2px);color:var(--text-muted);margin-bottom:16px;display:block\">"+kb.length+" 大类 · "+l1.categories.length+" 个分类</span>";
+  h+="<div class=\"kb-l1-tabs\">";
+  for(var i=0;i<kb.length;i++) h+="<div class=\"kb-l1-tab"+(i===currentKbL1?" active":"")+"\" onclick=\"switchKbL1("+i+")\">"+_esc(kb[i].name)+"</div>";
+  h+="</div>";
+  if(l1.overview) h+="<div class=\"kb-overview\">"+_esc(l1.overview).replace(/\n/g,"<br>")+"</div>";
+  h+="<div class=\"kb-l2-tabs\">";
+  for(var j=0;j<l1.categories.length;j++) h+="<div class=\"kb-l2-tab"+(j===currentKbL2?" active":"")+"\" onclick=\"switchKbL2("+j+")\">"+_esc(l1.categories[j].name)+"</div>";
+  h+="</div>";
+  var cat=l1.categories[currentKbL2];
+  if(!cat) h+="<div class=\"card\"><div class=\"empty-state\"><p>暂无分类</p></div></div>";
+  else if(!cat.items||!cat.items.length) h+="<div class=\"card\"><div class=\"empty-state\"><p>当前分类暂无内容</p></div></div>";
+  else { for(var k=0;k<cat.items.length;k++){
+    h+="<div class=\"kb-item\"><div class=\"kb-item-title\">"+_esc(cat.items[k].title)+"</div>";
+    if(cat.items[k].body) h+="<div class=\"kb-item-body\">"+_esc(cat.items[k].body)+"</div>";
+    h+="</div>";
+  }}
+  c.innerHTML=h;
 }
 
-function switchKbL1(idx){
-  currentKbL1 = idx;
-  currentKbL2 = 0;
+function switchKbL1(idx){ currentKbL1=idx; currentKbL2=0; renderPage(); }
+function switchKbL2(idx){ currentKbL2=idx; renderPage(); }
+
+document.addEventListener("DOMContentLoaded",function(){
+  updateDate(); setInterval(updateDate,1000);
+  var fs=PUB_DATA.fontsize||"medium", th=PUB_DATA.theme||"skyblue";
+  document.documentElement.setAttribute("data-fontsize",fs);
+  document.documentElement.setAttribute("data-theme",th);
+  document.querySelectorAll(".font-btn").forEach(function(b){b.classList.toggle("active",b.dataset.size===fs);});
+  document.querySelectorAll(".theme-dot").forEach(function(d){d.classList.toggle("active",d.dataset.theme===th);});
+  document.querySelectorAll(".font-btn").forEach(function(btn){ btn.addEventListener("click",function(){ document.querySelectorAll(".font-btn").forEach(function(b){b.classList.remove("active");}); btn.classList.add("active"); document.documentElement.setAttribute("data-fontsize",btn.dataset.size); }); });
+  document.querySelectorAll(".theme-dot").forEach(function(dot){ dot.addEventListener("click",function(){ document.querySelectorAll(".theme-dot").forEach(function(d){d.classList.remove("active");}); dot.classList.add("active"); document.documentElement.setAttribute("data-theme",dot.dataset.theme); }); });
+  document.querySelectorAll(".nav-item").forEach(function(item){ item.addEventListener("click",function(){ document.querySelectorAll(".nav-item").forEach(function(n){n.classList.remove("active");}); item.classList.add("active"); currentPage=item.dataset.page; var titles={points:"信息报送要点",scores:"信息得分情况",knowledge:"信息知识库"}; document.getElementById("pageTitle").textContent=titles[currentPage]; renderPage(); }); });
   renderPage();
-}
-
-function switchKbL2(idx){
-  currentKbL2 = idx;
-  renderPage();
-}
-
-function addKbL2(){
-  const kb = getKbData();
-  const name = prompt('请输入新分类名称：');
-  if(!name || !name.trim()) return;
-  kb[currentKbL1].categories.push({ name: name.trim(), items: [] });
-  DB.set('knowledge', kb);
-  currentKbL2 = kb[currentKbL1].categories.length - 1;
-  renderPage();
-  showToast('分类已添加','success');
-}
-
-function renameKbL2(idx, newName){
-  const kb = getKbData();
-  if(kb[currentKbL1] && kb[currentKbL1].categories[idx]){
-    const trimmed = newName.trim();
-    if(trimmed && trimmed !== kb[currentKbL1].categories[idx].name){
-      kb[currentKbL1].categories[idx].name = trimmed;
-      DB.set('knowledge', kb);
-    }
-  }
-}
-
-function addKbItem(){
-  const kb = getKbData();
-  const title = document.getElementById('kbNewTitle').value.trim();
-  const body = document.getElementById('kbNewBody').value.trim();
-  if(!title){ showToast('请输入标题','error'); return; }
-  const cat = kb[currentKbL1].categories[currentKbL2];
-  if(!cat.items) cat.items = [];
-  cat.items.push({ title, body });
-  DB.set('knowledge', kb);
-  renderPage();
-  showToast('已添加','success');
-}
-
-function deleteKbItem(idx){
-  const kb = getKbData();
-  const cat = kb[currentKbL1] && kb[currentKbL1].categories[currentKbL2];
-  if(!cat || !cat.items) return;
-  cat.items.splice(idx, 1);
-  DB.set('knowledge', kb);
-  renderPage();
-  showToast('已删除','success');
-}
-
-function uploadKbDoc(){
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.txt,.md,.docx';
-  input.onchange = function(e){
-    const file = e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = function(ev){
-      const text = ev.target.result;
-      if(!text || !text.trim()){ showToast('文件内容为空','error'); return; }
-      autoClassifyKbDoc(file.name, text);
-    };
-    if(file.name.endsWith('.txt') || file.name.endsWith('.md')){
-      reader.readAsText(file);
-    } else {
-      reader.readAsText(file);
-    }
-  };
-  input.click();
-}
-
-function autoClassifyKbDoc(fileName, text){
-  const kb = getKbData();
-  const lines = text.split('\n').filter(l=>l.trim());
-  if(lines.length === 0){ showToast('文档内容为空','error'); return; }
-
-  const catName = fileName.replace(/\.(txt|md|docx)$/i, '').trim();
-  let items = [];
-
-  // 按中文编号拆分
-  const numPattern = /^[一二三四五六七八九十]+[、．.]/;
-  const matchedLines = [];
-  let currentSection = null;
-
-  lines.forEach(line=>{
-    if(numPattern.test(line.trim())){
-      if(currentSection) matchedLines.push(currentSection);
-      currentSection = { title: line.trim().replace(numPattern, '').trim(), body: '' };
-    } else if(currentSection){
-      currentSection.body += (currentSection.body ? '\n' : '') + line.trim();
-    }
-  });
-  if(currentSection) matchedLines.push(currentSection);
-
-  if(matchedLines.length > 0){
-    items = matchedLines.map(s=>({ title: s.title || '未命名', body: s.body }));
-  } else {
-    items = [{ title: catName, body: text.trim() }];
-  }
-
-  // 添加到当前一级标签下
-  const l1 = kb[currentKbL1];
-  // 检查是否已有同名分类
-  let cat = l1.categories.find(c=>c.name === catName);
-  if(cat){
-    cat.items = cat.items.concat(items);
-  } else {
-    l1.categories.push({ name: catName, items });
-    currentKbL2 = l1.categories.length - 1;
-  }
-
-  DB.set('knowledge', kb);
-  renderPage();
-  showToast('文档已导入当前分类','success');
-}
-
-/* ========== Excel解析 ========== */
-function parseExcel(file, onSuccess, onError){
-  try{
-    const reader = new FileReader();
-    reader.onload = function(e){
-      try{
-        const data = new Uint8Array(e.target.result);
-        const wb = XLSX.read(data, { type:'array', cellDates:false, cellNF:false, cellText:false });
-        // 查找"全自动排序"工作表
-        let sheetName = wb.SheetNames.find(n=>n.includes('全自动排序') || n.includes('排序'));
-        if(!sheetName) sheetName = wb.SheetNames[0]; // 取第一个
-
-        const sheet = wb.Sheets[sheetName];
-        const rows = XLSX.utils.sheet_to_json(sheet, { header:1, defval:'', raw:false });
-        // 过滤尾部全空行
-        while(rows.length > 0 && rows[rows.length-1].every(c=>String(c).trim()==='')) rows.pop();
-
-        // 读取合并单元格信息
-        const allMerges = (sheet['!merges'] || []).map(m=>({
-          sr: m.s.r, sc: m.s.c, er: m.e.r, ec: m.e.c
-        }));
-
-        // 检测多张表（通过空行分隔），传入合并信息
-        const tables = detectTables(rows, allMerges);
-
-        // 自动分类：地市 / 直报点
-        tables.forEach(t=>{
-          const allText = (t.title + ' ' + t.rows.map(r=>r.join(' ')).join(' ')).toLowerCase();
-          if(allText.includes('直报') || allText.includes('直报点')){
-            t.tab = '直报点';
-          } else if(allText.includes('地市') || allText.includes('市公司') || allText.includes('分公司')){
-            t.tab = '地市';
-          } else {
-            t.tab = currentScoreTab || '地市'; // 默认归入当前标签
-          }
-        });
-
-        const result = { sheetName, tables, rawRows: rows, parsedAt: new Date().toISOString() };
-        onSuccess(result, sheetName, tables.length);
-      }catch(err){
-        onError(err.message || '解析失败');
-      }
-    };
-    reader.onerror = ()=>{ onError('文件读取失败'); };
-    reader.readAsArrayBuffer(file);
-  }catch(err){
-    onError(err.message || '解析失败');
-  }
-}
-
-function detectTables(rows, allMerges){
-  const tables = [];
-  let current = null;
-  let tableIdx = 0;
-  let currentOrigStart = -1; // 当前表在原始行中的起始行号
-
-  for(let i = 0; i < rows.length; i++){
-    const row = rows[i];
-    const isEmpty = row.every(c=>String(c).trim()==='');
-
-    if(isEmpty){
-      if(current && current.rows.length > 1){
-        current.merges = calcTableMerges(allMerges, currentOrigStart, current.rows.length);
-        tables.push(current);
-        current = null;
-      }
-      continue;
-    }
-
-    if(!current){
-      const nonEmptyCount = row.filter(c=>String(c).trim()!=='').length;
-      if(nonEmptyCount === 1 && i < rows.length - 1){
-        current = { title: String(row[0]).trim(), rows: [], tab: '', merges:[] };
-        currentOrigStart = i + 1; // 标题行被剥离，数据从下一行开始
-      } else {
-        current = { title: '表格 '+(tableIdx+1), rows: [], tab: '', merges:[] };
-        current.rows.push(row);
-        currentOrigStart = i;
-      }
-    } else {
-      const nonEmptyCount = row.filter(c=>String(c).trim()!=='').length;
-      if(nonEmptyCount === 1 && current.rows.length >= 3){
-        current.merges = calcTableMerges(allMerges, currentOrigStart, current.rows.length);
-        tables.push(current);
-        tableIdx++;
-        current = { title: String(row[0]).trim(), rows: [], tab: '', merges:[] };
-        currentOrigStart = i + 1;
-      } else {
-        current.rows.push(row);
-      }
-    }
-  }
-  if(current && current.rows.length > 0){
-    current.merges = calcTableMerges(allMerges, currentOrigStart, current.rows.length);
-    tables.push(current);
-  }
-
-  // 如果只检测到一张表，但行数很多（>30），尝试按内容拆分
-  if(tables.length === 1 && tables[0].rows.length > 30){
-    // 保持原样，不拆分
-  }
-
-  return tables;
-}
-
-// 将全局合并信息转换为表内相对行号的合并信息
-function calcTableMerges(allMerges, origStartRow, tableRowCount){
-  if(!allMerges || allMerges.length === 0) return [];
-  const result = [];
-  allMerges.forEach(m=>{
-    const sr = m.sr - origStartRow;
-    const er = m.er - origStartRow;
-    if(sr >= 0 && sr < tableRowCount && er >= 0){
-      result.push({ sr, sc:m.sc, er:Math.min(er, tableRowCount-1), ec:m.ec });
-    }
-  });
-  return result;
-}
-
-/* ========== 图片压缩 ========== */
-function compressImage(file, callback){
-  const reader = new FileReader();
-  reader.onload = function(e){
-    const img = new Image();
-    img.onload = function(){
-      const canvas = document.createElement('canvas');
-      let w = img.width, h = img.height;
-      const maxW = 1024;
-      if(w > maxW){ h = Math.round(h * maxW / w); w = maxW; }
-      canvas.width = w; canvas.height = h;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0, w, h);
-      const data = canvas.toDataURL('image/jpeg', 0.65);
-      callback(data);
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
-
-/* ========== 附件功能 ========== */
-function renderAttachments(key, attachments, title){
-  let html = '<div class="card" style="margin-top:20px"><div class="card-header">'+
-    '<div class="icon-box">'+IC.img+'</div><h3>'+esc(title)+'</h3></div>';
-  html += '<div class="img-upload-area" id="attachUpload_'+key+'" onclick="document.getElementById(\'attachInput_'+key+'\').click()">'+
-    IC.upload+'<p>点击上传图片或文件</p></div>';
-  html += '<input type="file" id="attachInput_'+key+'" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" style="display:none" multiple>';
-  if(attachments.length > 0){
-    html += '<div class="attachments"><div class="attach-grid">';
-    attachments.forEach((att, i)=>{
-      html += '<div class="attach-item" data-idx="'+i+'">';
-      if(att.type === 'image'){
-        html += '<img src="'+att.data+'">';
-      } else {
-        html += '<div style="height:90px;display:flex;align-items:center;justify-content:center;font-size:calc(var(--fs-base)-3px);color:var(--primary);text-align:center;padding:4px">'+esc(att.name)+'</div>';
-      }
-      html += '<div class="attach-name">'+esc(att.name)+'</div>';
-      html += '<button class="attach-del" onclick="deleteAttachment(\''+key+'\','+i+')">'+IC.close+'</button>';
-      html += '</div>';
-    });
-    html += '</div></div>';
-  } else {
-    html += '<p style="text-align:center;color:var(--text-muted);font-size:calc(var(--fs-base)-2px);padding:12px">暂无附件</p>';
-  }
-  html += '</div>';
-  return html;
-}
-
-function setupAttachments(key){
-  const input = document.getElementById('attachInput_'+key);
-  if(!input) return;
-  input.addEventListener('change', function(e){
-    const files = Array.from(e.target.files);
-    if(files.length === 0) return;
-    const attachments = DB.get(key, []);
-    let processed = 0;
-    files.forEach(file=>{
-      if(file.type.startsWith('image/')){
-        compressImage(file, data=>{
-          attachments.push({ name: file.name, type:'image', data, addedAt: new Date().toISOString() });
-          processed++;
-          if(processed === files.length){ DB.set(key, attachments); renderPage(); }
-        });
-      } else {
-        // 非图片文件，仅存名称
-        const reader = new FileReader();
-        reader.onload = function(ev){
-          // 限制大小：非图片文件不存base64内容（太大），只存元数据
-          if(file.size < 500000){
-            attachments.push({ name: file.name, type:'file', data: ev.target.result, addedAt: new Date().toISOString() });
-          } else {
-            attachments.push({ name: file.name, type:'file', data:'', addedAt: new Date().toISOString(), tooLarge: true });
-          }
-          processed++;
-          if(processed === files.length){ DB.set(key, attachments); renderPage(); }
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  });
-}
-
-function deleteAttachment(key, idx){
-  const attachments = DB.get(key, []);
-  attachments.splice(idx, 1);
-  DB.set(key, attachments);
-  renderPage();
-}
-
-/* ========== 工具函数 ========== */
-function esc(s){
-  if(s == null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function formatDate(iso){
-  if(!iso) return '';
-  const d = new Date(iso);
-  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-}
+});
 </script>
 </body>
 </html>
