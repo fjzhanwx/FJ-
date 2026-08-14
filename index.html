@@ -527,11 +527,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   setupFontTheme();
   setupModals();
   setupReinit();
-  if(!DB.get('initialized', false)){
-    showInitModal();
-  } else {
-    renderPage();
-  }
+  DB.set('initialized', true);
+  renderPage();
 });
 
 function updateDate(){
